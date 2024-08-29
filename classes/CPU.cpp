@@ -4,6 +4,7 @@
 
 #include "CPU.h"
 #include "iostream"
+#include <map>
 
 #include <cstdlib>
 #include <ctime>
@@ -359,7 +360,11 @@ void CPU::decode_opcode() {
             unsigned char y = registers[(opcode >> 4) & 0x0F];
             unsigned char height = opcode & 0x000F;
 
+
             registers[0x0F] = 0;
+
+
+
 
             for (int cur_height = 0; cur_height < height; cur_height++) {
 
@@ -370,16 +375,22 @@ void CPU::decode_opcode() {
 
                     unsigned char cur_bit = sprite_row & (0x80 >> bit_shift);
                     cur_bit = cur_bit != 0 ? 0x01 : 0x00;
+
+
                     if (cur_bit != 0) {
                         if (graphics->at(x, y) == 1) registers[0x0F] = 1;
                         unsigned char position_x = x + bit_shift;
                         unsigned char position_y = y + cur_height;
-                        graphics->set(position_y, position_x, cur_bit);
+
+
+                         graphics->set(position_y, position_x);
                     }
                 }
 
-
             }
+
+            graphics->update();
+
 
             inc();
 
@@ -483,7 +494,9 @@ void CPU::decode_opcode() {
 
                 case 0x0029: {
                     //Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font.
-                    //TODO implement
+                    unsigned char reg = (opcode >> 8) & 0x0F;
+                    unsigned char value = registers[reg];
+                    I = 0x50 + (value * 5);
                     inc();
                     break;
                 }
@@ -544,4 +557,23 @@ void CPU::skip() {
 
 void CPU::inc() {
     PC += 2;
+}
+
+void CPU::timers_tick() {
+
+    cycle_count--;
+
+    if (cycle_count == 0) {
+
+        if (DT > 0) DT--;
+
+        if (ST == 1) {
+            ST--;
+        }
+        if (ST > 0) ST--;
+
+
+        cycle_count = 12;
+    }
+
 }

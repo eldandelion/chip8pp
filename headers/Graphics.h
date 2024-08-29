@@ -5,6 +5,7 @@
 #ifndef CHIP8PP_GRAPHICS_H
 #define CHIP8PP_GRAPHICS_H
 #include "SDL.h"
+#include <map>
 
 
 class Graphics {
@@ -14,6 +15,8 @@ private:
     SDL_Event event;
 
     SDL_Renderer* renderer;
+
+    SDL_Texture *frameBufferTexture;
 
     SDL_Rect dest_rect;
 
@@ -28,7 +31,9 @@ public:
 
     void clear();
 
-    void set(unsigned char &x, unsigned char &y, unsigned char value);
+    void set(unsigned char &x, unsigned char &y);
+
+    void update();
 
     unsigned char at(unsigned char &x, unsigned char &y) const;
 

@@ -30,6 +30,8 @@ private:
 
     unsigned short opcode = 0x0000;
 
+    unsigned char cycle_count = 12;
+
     void decode_opcode();
 
     void skip();
@@ -41,6 +43,8 @@ public:
 
 
     void init();
+
+    void timers_tick();
 
 
     void fetch_opcode();

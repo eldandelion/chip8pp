@@ -27,6 +27,8 @@ constexpr unsigned char fontset[] = {
 };
 
 constexpr unsigned short FONT_ADDRESS = 0x50;
+constexpr Uint32 TARGET_FPS = 500;
+const Uint32 FRAME_DURATION = 1000 / TARGET_FPS;
 
 int main() {
 
@@ -46,11 +48,13 @@ int main() {
     }
 
     //game->load("/Volumes/Files/Programming/chip8pp/resources/ibm-logo.ch8", bus);
-    game->load("/Volumes/Files/Programming/chip8pp/resources/6-keypad.ch8", bus);
+    //game->load("/Volumes/Files/Programming/chip8pp/resources/6-keypad.ch8", bus);
     //game->load("/Volumes/Files/Programming/chip8pp/resources/3-corax+.ch8", bus);
     //game->load("/Volumes/Files/Programming/chip8pp/resources/4-flags.ch8", bus);
     //game->load("/Volumes/Files/Programming/chip8pp/resources/2048 (by Dr Gergo Erdi)(2014).ch8", bus);
     //game->load("/Volumes/Files/Programming/chip8pp/resources/Blitz (fix) (by David Winter).ch8", bus);
+    //game->load("/Volumes/Files/Programming/chip8pp/resources/Pong [Paul Vervalin, 1990].ch8", bus);
+    game->load("/Volumes/Files/Programming/chip8pp/resources/Pong (1 player).ch8", bus);
 
 
     graphics->init();
@@ -61,17 +65,22 @@ int main() {
 
     bool running = true;
     while (running) {
+
+        Uint32 current_time = SDL_GetTicks();
+        Uint32 delta_time = current_time - last_render_time;
+
         cpu->fetch_opcode();
+        cpu->timers_tick();
         graphics->render();
         input->monitor_keypress(graphics->get_event());
 
 
-//        Uint32 current_time = SDL_GetTicks();
-//        Uint32 delta_time = current_time - last_render_time;
-//        if (delta_time < 16) {
-//            SDL_Delay(16 - delta_time);
-//        }
-//        last_render_time = current_time;
+        // Calculate remaining time to maintain 500 Hz
+        if (delta_time < FRAME_DURATION) {
+            SDL_Delay(FRAME_DURATION - delta_time);
+        }
+
+        last_render_time = current_time;
     }
 
 
