@@ -51,10 +51,14 @@ int main() {
     //game->load("/Volumes/Files/Programming/chip8pp/resources/6-keypad.ch8", bus);
     //game->load("/Volumes/Files/Programming/chip8pp/resources/3-corax+.ch8", bus);
     //game->load("/Volumes/Files/Programming/chip8pp/resources/4-flags.ch8", bus);
+    //game->load("/Volumes/Files/Programming/chip8pp/resources/5-quirks.ch8", bus);
     //game->load("/Volumes/Files/Programming/chip8pp/resources/2048 (by Dr Gergo Erdi)(2014).ch8", bus);
     //game->load("/Volumes/Files/Programming/chip8pp/resources/Blitz (fix) (by David Winter).ch8", bus);
-    //game->load("/Volumes/Files/Programming/chip8pp/resources/Pong [Paul Vervalin, 1990].ch8", bus);
     game->load("/Volumes/Files/Programming/chip8pp/resources/Pong (1 player).ch8", bus);
+    //game->load("/Volumes/Files/Programming/chip8pp/resources/Tetris (by 12me21)(2017).ch8", bus);
+    //game->load("/Volumes/Files/Programming/chip8pp/resources/Spooky Spot [Joseph Weisbecker, 1978].ch8", bus);
+    //game->load("/Volumes/Files/Programming/chip8pp/resources/15 Puzzle (by Roger Ivie)(19xx).ch8", bus);
+    //game->load("/Volumes/Files/Programming/chip8pp/resources/Airplane (unknown)(19xx).ch8", bus);
 
 
     graphics->init();

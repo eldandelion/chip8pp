@@ -30,7 +30,7 @@ void CPU::fetch_opcode() {
 
     opcode = opcode_p1 << 8 | opcode_p2;
 
-    //std::cout << "Opcode: 0x" << std::hex << static_cast<int>(opcode) << std::endl;
+    std::cout << "Opcode: 0x" << std::hex << static_cast<int>(opcode) << std::endl;
 
     decode_opcode();
 
@@ -42,7 +42,6 @@ void CPU::decode_opcode() {
 
     switch (opcode & 0xF000) {
         case 0x0000: {
-
 
             switch (opcode & 0x00FF) {
 
@@ -109,10 +108,7 @@ void CPU::decode_opcode() {
         }
 
         case 0x4000: {
-
-
             //Skips the next instruction if VX does not equal NN (usually the next instruction is a jump to skip a code block).
-
             unsigned char reg = (opcode >> 8) & 0x0F;
             unsigned char value = opcode & 0xFF;
 
@@ -121,16 +117,10 @@ void CPU::decode_opcode() {
             } else {
                 inc();
             }
-
-
             break;
-
         }
 
         case 0x5000: {
-
-
-
             //Skips the next instruction if VX equals VY (usually the next instruction is a jump to skip a code block).
             unsigned char reg_1 = (opcode >> 8) & 0x0F;
             unsigned char reg_2 = (opcode >> 4) & 0x0F;
@@ -142,14 +132,9 @@ void CPU::decode_opcode() {
             }
 
             break;
-
         }
 
         case 0x6000: {
-
-
-
-
             //Sets VX to NN.
             unsigned char reg = (opcode >> 8) & 0x0F;
             unsigned char value = opcode & 0xFF;
@@ -157,13 +142,9 @@ void CPU::decode_opcode() {
             registers[reg] = value;
             inc();
             break;
-
         }
 
         case 0x7000: {
-
-
-
             //Adds NN to VX (carry flag is not changed).
             unsigned char reg = (opcode >> 8) & 0x0F;
             unsigned char value = opcode & 0xFF;
@@ -171,12 +152,9 @@ void CPU::decode_opcode() {
             registers[reg] += value;
             inc();
             break;
-
         }
 
         case 0x8000: {
-
-
             unsigned char reg_1 = (opcode >> 8) & 0x0F;
             unsigned char reg_2 = (opcode >> 4) & 0x0F;
             unsigned char value_1 = registers[reg_1];
@@ -185,117 +163,80 @@ void CPU::decode_opcode() {
             switch (opcode & 0x000F) {
 
                 case 0x0000: {
-
                     //Sets VX to the value of VY.
                     registers[reg_1] = value_2;
-                    inc();
                     break;
                 }
                 case 0x0001: {
-
                     //Sets VX to VX or VY. (bitwise OR operation).
-
-
                     registers[reg_1] |= value_2;
-                    inc();
+                    registers[0x0F] = 0;
                     break;
                 }
                 case 0x0002: {
-
                     //Sets VX to VX and VY. (bitwise AND operation).
-
-
                     registers[reg_1] &= value_2;
-                    inc();
-
+                    registers[0x0F] = 0;
                     break;
                 }
                 case 0x0003: {
-
                     //Sets VX to VX xor VY.
                     registers[reg_1] ^= value_2;
-
-                    inc();
-
+                    registers[0x0F] = 0;
                     break;
                 }
 
                 case 0x0004: {
-
                     unsigned short sum = value_1 + value_2;
-
                     if (sum > 0xFF) {
-                        registers[0x0F] = 1;
-                        registers[reg_1] = sum & 0xFF;
+                        registers[0x0F] = 0x01;
                     } else {
-                        registers[0x0F] = 0;
-                        registers[reg_1] = sum;
+                        registers[0x0F] = 0x00;
                     }
-
-                    inc();
-
+                    registers[reg_1] = sum;
                     break;
                 }
 
                 case 0x0005: {
-
                     if (value_1 >= value_2) {
                         registers[0x0F] = 1;
                     } else {
                         registers[0x0F] = 0;
                     }
-
                     registers[reg_1] -= value_2;
-
-                    inc();
-
                     break;
                 }
                 case 0x0006: {
-
-                    registers[0x0F] = value_1 & 0x0F;
+                    registers[reg_1] = value_2;
                     registers[reg_1] >>= 1;
-
-                    inc();
+                    registers[0x0F] = registers[reg_1] & 0x01;
 
                     break;
                 }
                 case 0x0007: {
-
                     if (value_2 >= value_1) {
-                        registers[0x0F] = 1;
+                        registers[0x0F] = 0x01;
                     } else {
-                        registers[0x0F] = 0;
+                        registers[0x0F] = 0x00;
                     }
-
                     registers[reg_1] = value_2 - value_1;
-
-                    inc();
-
                     break;
                 }
                 case 0x000E: {
-
                     //Shifts VX to the left by 1, then sets VF to 1 if the most significant bit of VX prior to that shift was set, or to 0 if it was unset.
-                    registers[0x0F] = (value_1 & 0x80) ? 1 : 0;
+                    registers[reg_1] = value_2;
+                    registers[0x0F] = (value_2 & 0x80) >> 7;
                     registers[reg_1] <<= 1;
-
-                    inc();
-
                     break;
                 }
 
             }
-
+            inc();
             break;
         }
 
         case 0x9000: {
-
-
-
             //Skips the next instruction if VX does not equal VY. (Usually the next instruction is a jump to skip a code block).
-
             unsigned char reg_1 = (opcode >> 8) & 0x0F;
             unsigned char reg_2 = (opcode >> 4) & 0x0F;
 
@@ -304,40 +245,25 @@ void CPU::decode_opcode() {
             } else {
                 inc();
             }
-
             break;
-
         }
 
         case 0xA000: {
-
-
-
             //Sets I to the address NNN.
 
             I = opcode & 0x0FFF;
             inc();
-
             break;
-
         }
 
         case 0xB000: {
-
-
             //Jumps to the address NNN plus V0.
-
-            PC = opcode & 0xF000;
+            PC = opcode & 0x0FFF;
             PC += registers[0];
-
             break;
-
         }
 
         case 0xC000: {
-
-
-
             //Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN.
 
             srand(time(0)); // seed the random number generator
@@ -349,7 +275,6 @@ void CPU::decode_opcode() {
             registers[reg] = random_number & value;
 
             inc();
-
             break;
         }
 
@@ -361,10 +286,8 @@ void CPU::decode_opcode() {
             unsigned char height = opcode & 0x000F;
 
 
+
             registers[0x0F] = 0;
-
-
-
 
             for (int cur_height = 0; cur_height < height; cur_height++) {
 
@@ -378,22 +301,24 @@ void CPU::decode_opcode() {
 
 
                     if (cur_bit != 0) {
-                        if (graphics->at(x, y) == 1) registers[0x0F] = 1;
+
                         unsigned char position_x = x + bit_shift;
                         unsigned char position_y = y + cur_height;
 
+                        position_x %= 64;
+                        position_y %= 32;
 
-                         graphics->set(position_y, position_x);
+
+                        if (graphics->at(position_x, position_y) == 1) registers[0x0F] = 1;
+
+                        graphics->set(position_y, position_x);
                     }
                 }
 
             }
 
             graphics->update();
-
-
             inc();
-
             break;
         }
 
@@ -403,8 +328,6 @@ void CPU::decode_opcode() {
             unsigned char key_number = registers[reg];
 
             switch (opcode & 0x00FF) {
-
-
                 case 0x009E: {
 
                     if (input->get_key(key_number)) {
@@ -412,8 +335,6 @@ void CPU::decode_opcode() {
                     } else {
                         inc();
                     }
-
-
                     break;
                 }
 
@@ -424,22 +345,17 @@ void CPU::decode_opcode() {
                     } else {
                         inc();
                     }
-
                     break;
                 }
 
                 default:
                     throw "Unknown opcode " + opcode;
-
-
             }
 
             break;
-
         }
 
         case 0xF000: {
-
 
             unsigned char reg = (opcode >> 8) & 0x0F;
             unsigned char reg_value = registers[reg];
@@ -450,7 +366,6 @@ void CPU::decode_opcode() {
 
                     registers[reg] = DT;
                     inc();
-
                     break;
                 }
 
@@ -465,30 +380,24 @@ void CPU::decode_opcode() {
                         }
                     }
 
-
                     break;
                 }
 
                 case 0x0015: {
-
                     DT = reg_value;
                     inc();
-
                     break;
                 }
 
                 case 0x0018: {
                     ST = reg_value;
                     inc();
-
                     break;
                 }
 
                 case 0x001E: {
-
                     I += reg_value;
                     inc();
-
                     break;
                 }
 
@@ -508,40 +417,30 @@ void CPU::decode_opcode() {
                     bus->write(I + 2, (registers[(opcode & 0x0F00) >> 8] % 100) % 10);
 
                     inc();
-
                     break;
                 }
                 case 0x0055: {
                     for (unsigned char it = 0; it <= reg; it++) {
-                        bus->write(I + it, registers[it]);
+                        bus->write(I++, registers[it]);
                     }
 
                     inc();
-
                     break;
                 }
 
                 case 0x0065: {
-
                     for (unsigned char it = 0; it <= reg; it++) {
-                        registers[it] = bus->read(I + it);
+                        registers[it] = bus->read(I++);
                     }
 
                     inc();
-
                     break;
-
                 }
 
                 default:
                     throw "Unknown opcode " + opcode;
-
-
             }
-
-
             break;
-
         }
 
         default: {
